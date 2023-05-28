@@ -1,0 +1,43 @@
+--Solution for 2023 - week 20 PreppinData Challenge
+--https://preppindata.blogspot.com/2023/05/2023-week-20-dining-hall-debacle.html
+
+--Inserted Data from xlsx into SQL Server
+
+--VIEW INTERMIDIARY DATA
+select * from [dbo].['Meal Nutritional Info$']
+select * from [dbo].['Meal Prices$']
+
+--clean-up some data
+--update [dbo].['Meal Nutritional Info$']
+--set type = 'Vegetarian'
+--where Type = 'Veggie'
+
+--VIEW CLEANED DATA
+select mi.[Meal Option], mi.Type, mi.[Calories (kcal)],mp.Price into meals from meal_info mi inner join meal_price mp on mi.[Meal Option] = mp.[Meal Option] 
+
+--create new table with clean data
+CREATE TABLE meals AS (select * from meal_info mi inner join meal_price mp on mi.[Meal Option] = mp.[Meal Option])
+
+---CHECK FOR ISSUES
+select distinct type  from meals where type like 'meat%'
+select * from meals
+select distinct [meal option] from meals
+
+--Cleaned-up data 
+--update meals
+--set type = 'Meat-based' where type = 'Meat based'
+
+-------------------REQUIREMENTS-------------------------
+--Group meal types 
+--Hint - veggie and vegetarian are the same type 
+--Join the data sets together so you have the meal type and price for each meal 
+--Remove the irrelevant fields
+--Aggregate the data by meal type and average their price
+--Calculate the percentage of total for each meal type 
+--Hint - this blog post is helpful for this step
+--Rename the fields to match the output data example 
+----------------------- SOLVED AS PER REQUIREMENTS (BELOW0
+
+select Type, CAST(AVG(Price) AS decimal(10,2)) [Average Price],  CAST(SUM(Price)*100 /(SELECT SUM(Price) from meals) AS DECIMAL(10,2)) as Percent_total from meals
+group by Type
+
